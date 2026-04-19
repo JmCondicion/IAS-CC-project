@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Records - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .nav-links { margin-bottom: 1.5rem; }
+        .nav-links a { margin-right: 1rem; color: #4f46e5; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header style="margin-bottom: 2rem;">
+            <h1>📊 Attendance Records</h1>
+        </header>
+
+        <div class="dashboard-card">
+            <div class="nav-links">
+                <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('admin.manage_students') }}">Students</a>
+                <a href="{{ url_for('admin.view_attendance') }}">Attendance</a>
+                <a href="{{ url_for('admin.logout') }}" style="color: #ef4444;">Logout</a>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Student ID</th>
+                            <th>Timestamp</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td>{{ record.student.name if record.student else 'Unknown' }}</td>
+                            <td>{{ record.student_id }}</td>
+                            <td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') if record.timestamp else 'N/A' }}</td>
+                            <td>
+                                <span class="status-badge {{ 'status-in' if record.status == 'IN' else 'status-out' }}">
+                                    {{ record.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="loading">No attendance records found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if pagination.pages > 1 %}
+            <div class="pagination">
+                {% if pagination.has_prev %}
+                <a href="?page={{ pagination.prev_num }}"><button>Previous</button></a>
+                {% endif %}
+                
+                <span style="padding: 0.5rem 1rem;">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+                
+                {% if pagination.has_next %}
+                <a href="?page={{ pagination.next_num }}"><button>Next</button></a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

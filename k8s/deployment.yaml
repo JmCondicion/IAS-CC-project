@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-deployment
+  labels:
+    app: qr-attendance
+    tier: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: qr-attendance
+      tier: web
+  template:
+    metadata:
+      labels:
+        app: qr-attendance
+        tier: web
+    spec:
+      containers:
+      - name: flask-app
+        image: qr-attendance:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: FLASK_APP
+          value: "app.py"
+        - name: FLASK_ENV
+          value: "production"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: flask-secret
+              key: database-url
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: flask-secret
+              key: secret-key
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: flask-secret
+              key: redis-url
+        - name: ADMIN_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: flask-secret
+              key: admin-username
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flask-secret
+              key: admin-password
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      restartPolicy: Always

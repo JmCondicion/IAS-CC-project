@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Attendance System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 QR Attendance System</h1>
+            <p class="subtitle">Scan your QR code to mark attendance</p>
+        </header>
+
+        <main>
+            <!-- QR Scanner Section -->
+            <section class="scanner-section">
+                <div class="scanner-card">
+                    <h2>📷 Scan QR Code</h2>
+                    <div id="reader" class="qr-reader"></div>
+                    <div id="scan-status" class="scan-status"></div>
+                    <button id="start-scan-btn" class="btn btn-primary">Start Scanner</button>
+                    <button id="stop-scan-btn" class="btn btn-secondary" style="display: none;">Stop Scanner</button>
+                </div>
+            </section>
+
+            <!-- Live Dashboard Section -->
+            <section class="dashboard-section">
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <h2>📊 Live Attendance</h2>
+                        <button id="refresh-btn" class="btn btn-sm">🔄 Refresh</button>
+                    </div>
+                    
+                    <div class="filters">
+                        <input type="date" id="date-filter" class="filter-input">
+                        <input type="text" id="student-id-filter" placeholder="Student ID" class="filter-input">
+                        <button id="apply-filters-btn" class="btn btn-sm">Apply</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="attendance-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Student ID</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-body">
+                                <tr>
+                                    <td colspan="4" class="loading">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- html5-qrcode library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="{{ url_for('static', filename='js/scanner.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  flask-app:
+    build: .
+    container_name: qr-attendance-app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - DATABASE_URL=mysql+pymysql://root:mysqlpassword@mysql:3306/qr_attendance
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./app:/app/app
+      - ./migrations:/app/migrations
+    networks:
+      - qr-network
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: qr-attendance-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: mysqlpassword
+      MYSQL_DATABASE: qr_attendance
+      MYSQL_USER: attendance_user
+      MYSQL_PASSWORD: attendancelog123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - qr-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: qr-attendance-phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: mysqlpassword
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - qr-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: qr-attendance-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - qr-network
+    restart: unless-stopped
+
+networks:
+  qr-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

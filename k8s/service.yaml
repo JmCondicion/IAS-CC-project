@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-service
+  labels:
+    app: qr-attendance
+    tier: web
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 5000
+    protocol: TCP
+    name: http
+    nodePort: 30080
+  selector:
+    app: qr-attendance
+    tier: web

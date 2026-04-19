@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - QR Attendance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: #f9fafb; padding: 1.5rem; border-radius: 0.5rem; text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: #4f46e5; }
+        .stat-label { color: #6b7280; margin-top: 0.5rem; }
+        .nav-links { margin-bottom: 1.5rem; }
+        .nav-links a { margin-right: 1rem; color: #4f46e5; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header style="margin-bottom: 2rem;">
+            <h1>🔐 Admin Dashboard</h1>
+            <p class="subtitle">QR Attendance Management System</p>
+        </header>
+
+        <div class="dashboard-card">
+            <div class="nav-links">
+                <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('admin.manage_students') }}">Students</a>
+                <a href="{{ url_for('admin.view_attendance') }}">Attendance</a>
+                <a href="{{ url_for('admin.logout') }}" style="color: #ef4444;">Logout</a>
+            </div>
+
+            <h2>Today's Overview</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ today_count }}</div>
+                    <div class="stat-label">Attendances Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ total_students }}</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+            </div>
+
+            <h3>Recent Activity</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in recent_records %}
+                        <tr>
+                            <td>{{ record.student.name if record.student else 'Unknown' }}</td>
+                            <td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M') if record.timestamp else 'N/A' }}</td>
+                            <td>
+                                <span class="status-badge {{ 'status-in' if record.status == 'IN' else 'status-out' }}">
+                                    {{ record.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="loading">No recent records</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
